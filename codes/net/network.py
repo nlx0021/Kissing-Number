@@ -94,6 +94,8 @@ class PolicyHead(nn.Module):
                  N_features=64,
                  device="cuda"):
         
+        super(PolicyHead, self).__init__()
+        
         self.d = d
         self.N_limit = N_limit
         self.n_attentive = n_attentive
@@ -120,7 +122,7 @@ class PolicyHead(nn.Module):
         n_attentive = self.n_attentive
         
         for idx in range(n_attentive):
-            c = self.attentions[idx](x)
+            c = self.attentions[idx]([x])
             x = x + c
         
         mu = x    # [B, N, d]
@@ -137,6 +139,8 @@ class ValueHead(nn.Module):
                  inter_channel=256,
                  device='cuda'):
         
+        super(ValueHead, self).__init__()
+        
         self.d = d
         self.N_limit = N_limit
         self.value_layers = value_layers
@@ -150,7 +154,9 @@ class ValueHead(nn.Module):
         
     def forward(self, x):
         
-        x = x.reshape(-1, 1)           # [B, N*d]
+        d = self.d
+        N_limit = self.N_limit
+        x = x.reshape(-1, d * N_limit)           # [B, N*d]
         
         N_layers = self.value_layers
         x = self.relus[0](self.in_linear(x))
@@ -174,6 +180,8 @@ class Net(nn.Module):
                  value_layers=3,
                  inter_channel=256,
                  device='cuda'):
+        
+        super(Net, self).__init__()
         
         self.d = d
         self.N_limit = N_limit
@@ -202,3 +210,19 @@ class Net(nn.Module):
         v, sigma = self.value_head(x)
         
         return mu, v, sigma
+    
+    
+    
+if __name__ == '__main__':
+    
+    d = 3
+    N_limit = 15
+    net = Net(d=d, N_limit=N_limit, device="cpu")
+    cur_state = np.zeros((N_limit, d), dtype=np.float32)
+    cur_state[0,0] = 1.
+    
+    network_in = torch.tensor(cur_state)[None, ...] 
+    import pdb; pdb.set_trace()
+    network_out = net(network_in)
+    mu, v, sigma = network_out
+    import pdb; pdb.set_trace()
