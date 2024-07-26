@@ -63,10 +63,9 @@ class Environment():
         '''
         Judge that whether the balls intersect.
         '''
+        # CHECK.
         
-        G = np.matmul(self.cur_state, self.cur_state.T)
-        np.fill_diagonal(G, 0)
-        return (np.logical_and(G>=-1, G<=1/2)).all()
+        return is_valid_state(self.cur_state)
     
     
     def reset(self):
