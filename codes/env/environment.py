@@ -68,6 +68,14 @@ class Environment():
         return is_valid_state(self.cur_state)
     
     
+    def to_polar(self):
+        '''
+        Transform the current state to polar coord.
+        '''
+
+        return cart_to_polar(self.cur_state)
+   
+    
     def reset(self):
         
         self.cur_state = self.get_init_state()
